@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EduBot AI — Hacktiv8 Final Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0e14;--surface:#111520;--surface2:#181d2a;--border:#232a3d;
+  --accent:#4f8ef7;--accent2:#7c5cfc;--gold:#f5c542;
+  --text:#e8eaf2;--muted:#6b7491;
+  --bot-bubble:#141926;--user-bubble:#1a2340;
+  --success:#36d399;--danger:#f87272;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+
+/* ── HEADER ── */
+header{
+  display:flex;align-items:center;gap:14px;padding:13px 22px;
+  background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.logo{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  box-shadow:0 0 18px rgba(79,142,247,.4);flex-shrink:0;
+}
+.hinfo h1{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;}
+.hinfo p{font-size:.72rem;color:var(--muted);margin-top:1px;}
+.sdot{
+  width:7px;height:7px;background:var(--success);border-radius:50%;
+  display:inline-block;margin-right:5px;box-shadow:0 0 6px var(--success);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.sbadge{
+  padding:5px 11px;border-radius:20px;font-size:.71rem;font-weight:600;
+  border:1px solid var(--border);cursor:pointer;transition:all .2s;
+  color:var(--muted);background:var(--surface2);
+}
+.sbadge:hover,.sbadge.active{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,.1);}
+.sbadge.active{box-shadow:0 0 10px rgba(79,142,247,.18);}
+.key-btn{
+  padding:5px 11px;border-radius:20px;font-size:.71rem;font-weight:600;
+  border:1px solid rgba(245,197,66,.35);cursor:pointer;transition:all .2s;
+  color:var(--gold);background:rgba(245,197,66,.08);
+}
+.key-btn:hover{background:rgba(245,197,66,.15);}
+
+/* ── CHAT ── */
+.chat-wrap{flex:1;overflow-y:auto;scroll-behavior:smooth;padding:22px 0;}
+.chat-wrap::-webkit-scrollbar{width:4px;}
+.chat-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.msgs{max-width:760px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:18px;}
+
+/* Welcome */
+.welcome{
+  background:linear-gradient(135deg,rgba(79,142,247,.07),rgba(124,92,252,.07));
+  border:1px solid rgba(79,142,247,.18);border-radius:20px;
+  padding:26px 26px 20px;text-align:center;animation:fadeUp .5s ease both;
+}
+.welcome .em{font-size:2.4rem;margin-bottom:8px;}
+.welcome h2{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;}
+.welcome p{color:var(--muted);font-size:.85rem;margin-top:5px;line-height:1.6;}
+.pills{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:16px;}
+.pill{
+  padding:6px 13px;border-radius:30px;font-size:.76rem;font-weight:500;
+  background:var(--surface2);border:1px solid var(--border);
+  cursor:pointer;transition:all .2s;color:var(--text);
+}
+.pill:hover{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,.08);transform:translateY(-1px);}
+
+/* Bubbles */
+.msg{display:flex;gap:11px;animation:fadeUp .3s ease both;}
+.msg.user{flex-direction:row-reverse;}
+.av{
+  width:33px;height:33px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;margin-top:2px;
+}
+.av.bot{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 12px rgba(79,142,247,.3);}
+.av.user{background:var(--surface2);border:1px solid var(--border);}
+.bubble{
+  max-width:76%;padding:12px 15px;border-radius:15px;
+  font-size:.875rem;line-height:1.65;
+}
+.msg.bot .bubble{background:var(--bot-bubble);border:1px solid var(--border);border-top-left-radius:4px;}
+.msg.user .bubble{background:var(--user-bubble);border:1px solid rgba(79,142,247,.22);border-top-right-radius:4px;}
+.bubble strong{color:var(--accent);font-weight:600;}
+.bubble code{
+  font-family:'Courier New',monospace;font-size:.81em;
+  background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;color:var(--gold);
+}
+.bubble pre{
+  background:#0d1117;border:1px solid var(--border);border-radius:9px;
+  padding:11px;margin:9px 0;overflow-x:auto;
+}
+.bubble pre code{background:none;padding:0;color:#e6edf3;}
+.bubble ul,.bubble ol{padding-left:18px;margin:6px 0;}
+.bubble li{margin-bottom:3px;}
+.ts{font-size:.63rem;color:var(--muted);margin-top:5px;}
+.msg.user .ts{text-align:right;}
+
+/* Typing */
+.typing-ind{display:flex;gap:5px;padding:13px 15px;}
+.dot{width:7px;height:7px;background:var(--muted);border-radius:50%;animation:bounce .9s infinite;}
+.dot:nth-child(2){animation-delay:.15s;}
+.dot:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* ── INPUT ── */
+.input-area{
+  padding:14px 20px;background:var(--surface);
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.input-row{max-width:760px;margin:0 auto;display:flex;gap:9px;align-items:flex-end;}
+.input-box{
+  flex:1;display:flex;align-items:flex-end;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:15px;padding:9px 13px;gap:9px;transition:border-color .2s;
+}
+.input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.1);}
+#userInput{
+  flex:1;background:none;border:none;outline:none;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.88rem;resize:none;
+  max-height:120px;overflow-y:auto;line-height:1.5;
+}
+#userInput::placeholder{color:var(--muted);}
+.send-btn{
+  width:37px;height:37px;border-radius:11px;border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;transition:all .2s;
+  box-shadow:0 4px 14px rgba(79,142,247,.4);
+}
+.send-btn:hover{transform:scale(1.05);}
+.send-btn:active{transform:scale(.97);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.hint{text-align:center;font-size:.68rem;color:var(--muted);margin-top:9px;}
+
+/* ── OVERLAY ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.overlay.hidden{display:none;}
+
+/* ── MODAL TABS ── */
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:22px;max-width:480px;width:100%;
+  animation:fadeUp .4s ease;overflow:hidden;
+}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border);}
+.tab{
+  flex:1;padding:14px;text-align:center;font-size:.82rem;font-weight:600;
+  cursor:pointer;color:var(--muted);transition:all .2s;border:none;background:none;
+}
+.tab.active{color:var(--accent);border-bottom:2px solid var(--accent);}
+.tab-body{padding:26px;}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+.modal h2{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:6px;}
+.modal p{color:var(--muted);font-size:.83rem;line-height:1.6;margin-bottom:16px;}
+.modal input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:11px;padding:11px 13px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;
+  margin-bottom:12px;transition:border-color .2s;
+}
+.modal input:focus{border-color:var(--accent);}
+.mbtn{
+  width:100%;padding:12px;border-radius:11px;border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:.88rem;
+  font-weight:600;cursor:pointer;transition:opacity .2s;margin-bottom:8px;
+}
+.mbtn:hover{opacity:.9;}
+.mbtn.ghost{
+  background:none;border:1px solid var(--border);color:var(--muted);margin-bottom:0;
+}
+.mbtn.ghost:hover{color:var(--text);border-color:var(--muted);}
+
+/* Steps */
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:18px;}
+.step{display:flex;gap:12px;align-items:flex-start;}
+.step-num{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;margin-top:1px;
+}
+.step-text h3{font-size:.85rem;font-weight:600;margin-bottom:2px;}
+.step-text p{font-size:.78rem;color:var(--muted);line-height:1.5;margin:0;}
+.step-text a{color:var(--accent);text-decoration:none;}
+.step-text a:hover{text-decoration:underline;}
+.copy-box{
+  background:var(--surface2);border:1px solid var(--border);border-radius:9px;
+  padding:9px 12px;font-family:'Courier New',monospace;font-size:.78rem;
+  color:var(--gold);margin-top:6px;word-break:break-all;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.copy-box button{
+  background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;
+  padding:3px 7px;border-radius:5px;border:1px solid var(--border);
+  transition:all .2s;flex-shrink:0;
+}
+.copy-box button:hover{color:var(--accent);border-color:var(--accent);}
+.warn-box{
+  background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.25);
+  border-radius:10px;padding:10px 13px;font-size:.78rem;color:var(--gold);
+  line-height:1.5;margin-bottom:14px;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:600px){
+  header{padding:10px 14px;}
+  .sbadge{display:none;}
+  .msgs{padding:0 12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── MODAL OVERLAY ── -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-tabs">
+      <button class="tab active" onclick="switchTab('enter')">🔑 Masukkan Key</button>
+      <button class="tab" onclick="switchTab('guide')">📖 Cara Buat Key</button>
+    </div>
+    <div class="tab-body">
+
+      <!-- TAB 1: Masukkan Key -->
+      <div class="tab-pane active" id="tab-enter">
+        <h2>API Key Anthropic</h2>
+        <p>Masukkan API Key untuk mengaktifkan EduBot AI. Key kamu hanya tersimpan di browser ini.</p>
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off"/>
+        <div id="keyError" style="color:var(--danger);font-size:.78rem;margin-bottom:10px;display:none;">⚠️ Format key tidak valid. Harus diawali <code>sk-ant</code></div>
+        <button class="mbtn" onclick="saveKey()">✅ Aktifkan EduBot AI</button>
+        <button class="mbtn ghost" onclick="useDemoMode()">👀 Coba Mode Demo (tanpa key)</button>
+        <p style="text-align:center;font-size:.7rem;margin-top:12px;margin-bottom:0">
+          Belum punya API Key? Klik tab <strong style="color:var(--accent)">Cara Buat Key</strong> di atas ↑
+        </p>
+      </div>
+
+      <!-- TAB 2: Panduan -->
+      <div class="tab-pane" id="tab-guide">
+        <h2>Cara Membuat API Key</h2>
+        <p>Ikuti langkah berikut untuk mendapatkan API Key Anthropic secara gratis (ada free credit $5):</p>
+
+        <div class="warn-box">
+          ⚠️ Jangan pernah share API Key kamu ke siapapun. Simpan seperti password!
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <h3>Buka Anthropic Console</h3>
+              <p>Kunjungi website resmi Anthropic dan buat akun gratis.</p>
+              <div class="copy-box">
+                <span>https://console.anthropic.com</span>
+                <button onclick="copyText('https://console.anthropic.com',this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <h3>Daftar / Login</h3>
+              <p>Klik <strong>Sign Up</strong> dan daftar pakai email Google atau email biasa. Verifikasi email kamu.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              <h3>Masuk ke API Keys</h3>
+              <p>Setelah login, klik menu <strong>API Keys</strong> di sidebar kiri, atau langsung ke:</p>
+              <div class="copy-box">
+                <span>https://console.anthropic.com/settings/keys</span>
+                <button onclick="copyText('https://console.anthropic.com/settings/keys',this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text">
+              <h3>Create New Key</h3>
+              <p>Klik tombol <strong>+ Create Key</strong>, beri nama bebas (misal: "EduBot"), lalu klik <strong>Create Key</strong>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-text">
+              <h3>Copy API Key</h3>
+              <p>Key akan muncul <strong>sekali saja</strong> — langsung copy dan simpan! Formatnya seperti ini:</p>
+              <div class="copy-box"><span>sk-ant-api03-xxxxxxxxxxxx...</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-text">
+              <h3>Paste di Tab "Masukkan Key"</h3>
+              <p>Kembali ke tab <strong>Masukkan Key</strong> di atas, paste key kamu, lalu klik Aktifkan.</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="mbtn" onclick="switchTab('enter')">← Kembali & Masukkan Key</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">🎓</div>
+  <div class="hinfo">
+    <h1>EduBot AI</h1>
+    <p><span class="sdot"></span>Asisten Belajar Cerdas · Hacktiv8 Final Project</p>
+  </div>
+  <div class="hright">
+    <button class="sbadge active" data-subject="umum" onclick="setSubject(this)">🌐 Umum</button>
+    <button class="sbadge" data-subject="matematika" onclick="setSubject(this)">🧮 Matematika</button>
+    <button class="sbadge" data-subject="pemrograman" onclick="setSubject(this)">💻 Coding</button>
+    <button class="sbadge" data-subject="sains" onclick="setSubject(this)">🔬 Sains</button>
+    <button class="key-btn" onclick="openModal()">🔑 API Key</button>
+  </div>
+</header>
+
+<!-- ── CHAT ── -->
+<div class="chat-wrap" id="chatWrap">
+  <div class="msgs" id="msgs">
+    <div class="welcome">
+      <div class="em">🎓</div>
+      <h2>Halo! Aku EduBot AI</h2>
+      <p>Asisten belajar pintarmu yang siap membantu memahami pelajaran apa saja.<br>Pilih topik atau langsung ketik pertanyaanmu!</p>
+      <div class="pills">
+        <span class="pill" onclick="sendQuick(this)">📐 Jelaskan teorema Pythagoras</span>
+        <span class="pill" onclick="sendQuick(this)">🐍 Cara kerja list di Python</span>
+        <span class="pill" onclick="sendQuick(this)">⚛️ Apa itu atom dan elektron?</span>
+        <span class="pill" onclick="sendQuick(this)">📝 Tips belajar yang efektif</span>
+        <span class="pill" onclick="sendQuick(this)">🌍 Jelaskan revolusi industri</span>
+        <span class="pill" onclick="sendQuick(this)">🧬 Apa itu DNA dan fungsinya?</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INPUT ── -->
+<div class="input-area">
+  <div class="input-row">
+    <div class="input-box">
+      <textarea id="userInput" rows="1" placeholder="Tanya apa saja tentang pelajaran... (Enter untuk kirim)"></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+  <p class="hint">EduBot AI · Hacktiv8 Final Project · Dibuat dengan Claude AI by Anthropic</p>
+</div>
+
+<script>
+// ── STATE ──
+let apiKey = '';
+let demoMode = false;
+let currentSubject = 'umum';
+const history = [];
+
+const systemPrompts = {
+  umum:        'Kamu adalah EduBot AI, asisten pendidikan yang ramah dan cerdas. Jawab dalam Bahasa Indonesia dengan jelas, terstruktur, dan mudah dipahami pelajar. Gunakan contoh nyata dan analogi yang relevan. Jika sesuai, gunakan poin-poin atau langkah-langkah agar mudah dibaca.',
+  matematika:  'Kamu adalah EduBot AI, spesialis matematika. Jelaskan konsep matematis step-by-step, tampilkan rumus dengan jelas, dan selalu berikan contoh soal beserta penyelesaiannya. Jawab dalam Bahasa Indonesia yang ramah dan mudah dipahami siswa.',
+  pemrograman: 'Kamu adalah EduBot AI, mentor programming berpengalaman. Jelaskan konsep coding dengan contoh kode nyata, best practices, dan penjelasan output. Selalu tampilkan kode dalam blok kode. Jawab dalam Bahasa Indonesia yang santai dan mudah dipahami.',
+  sains:       'Kamu adalah EduBot AI, guru sains yang antusias. Jelaskan konsep ilmiah dengan analogi sehari-hari, fakta menarik, dan aplikasi nyata di kehidupan. Buat sains terasa menyenangkan! Jawab dalam Bahasa Indonesia.',
+};
+
+const demoReply = `Halo! 👋 Kamu sedang dalam **mode demo** — EduBot AI belum terhubung ke API.\n\nUntuk mengaktifkan fitur penuh:\n1. Klik tombol **🔑 API Key** di kanan atas\n2. Ikuti panduan **Cara Buat Key** untuk mendapatkan API Key gratis\n3. Paste key kamu dan mulai belajar!\n\nAPI Key Anthropic bisa didapat gratis di **console.anthropic.com** dengan free credit $5 untuk percobaan.`;
+
+// ── MODAL ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&name==='enter')||(i===1&&name==='guide')));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function openModal() {
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function saveKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  const err = document.getElementById('keyError');
+  if (!val.startsWith('sk-ant')) {
+    err.style.display = 'block';
+    document.getElementById('apiKeyInput').style.borderColor = 'var(--danger)';
+    return;
+  }
+  err.style.display = 'none';
+  apiKey = val;
+  demoMode = false;
+  document.getElementById('overlay').classList.add('hidden');
+  appendMsg('bot', '✅ **API Key berhasil disimpan!** EduBot AI siap membantu belajarmu. Tanya apa saja!');
+}
+
+function useDemoMode() {
+  demoMode = true;
+  apiKey = '';
+  document.getElementById('overlay').classList.add('hidden');
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = 'Copy', 1800);
+  });
+}
+
+// ── SUBJECT ──
+function setSubject(el) {
+  document.querySelectorAll('.sbadge').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentSubject = el.dataset.subject;
+}
+
+// ── CHAT ──
+function getTime() {
+  return new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+}
+
+function formatText(raw) {
+  let t = raw;
+  // code blocks first
+  t = t.replace(/```(\w+)?\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  t = t.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  // bold
+  t = t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // split paragraphs
+  const parts = t.split(/\n\n+/);
+  return parts.map(p => {
+    if (p.startsWith('<pre>')) return p;
+    // ordered list
+    if (/^\d+\./.test(p.trim())) {
+      const items = p.split('\n').filter(Boolean).map(l => `<li>${l.replace(/^\d+\.\s*/,'')}</li>`).join('');
+      return `<ol>${items}</ol>`;
+    }
+    // unordered list
+    if (/^[-•]/.test(p.trim())) {
+      const items = p.split('\n').filter(Boolean).map(l => `<li>${l.replace(/^[-•]\s*/,'')}</li>`).join('');
+      return `<ul>${items}</ul>`;
+    }
+    return `<p>${p.replace(/\n/g,'<br>')}</p>`;
+  }).join('');
+}
+
+function appendMsg(role, text) {
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  d.innerHTML = `
+    <div class="av ${role}">${role==='bot'?'🎓':'👤'}</div>
+    <div>
+      <div class="bubble">${formatText(text)}</div>
+      <div class="ts">${getTime()}</div>
+    </div>`;
+  c.appendChild(d);
+  document.getElementById('chatWrap').scrollTop = 99999;
+}
+
+function showTyping() {
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg bot'; d.id = 'typing';
+  d.innerHTML = `<div class="av bot">🎓</div><div class="bubble"><div class="typing-ind"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  c.appendChild(d);
+  document.getElementById('chatWrap').scrollTop = 99999;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function sendQuick(el) {
+  document.getElementById('userInput').value = el.textContent.slice(2).trim();
+  sendMessage();
+}
+
+async function sendMessage() {
+  const inp = document.getElementById('userInput');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  appendMsg('user', text);
+  history.push({role:'user', content:text});
+  showTyping();
+
+  // Demo mode
+  if (demoMode || !apiKey) {
+    await new Promise(r => setTimeout(r, 900));
+    removeTyping();
+    appendMsg('bot', demoReply);
+    history.push({role:'assistant', content:demoReply});
+    document.getElementById('sendBtn').disabled = false;
+    return;
+  }
+
+  // Real API
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true',
+      },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: systemPrompts[currentSubject],
+        messages: history.slice(-14),
+      }),
+    });
+
+    removeTyping();
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      const msg = err.error?.message || `HTTP ${res.status}`;
+      appendMsg('bot', `⚠️ **Error API**: ${msg}\n\nCek API Key kamu dengan klik **🔑 API Key** di kanan atas.`);
+    } else {
+      const data = await res.json();
+      const reply = data.content.map(b => b.type==='text'?b.text:'').join('');
+      appendMsg('bot', reply);
+      history.push({role:'assistant', content:reply});
+    }
+  } catch(e) {
+    removeTyping();
+    appendMsg('bot', `⚠️ **Koneksi gagal**: ${e.message}`);
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// Auto-resize textarea
+document.getElementById('userInput').addEventListener('input', function(){
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight,120)+'px';
+});
+document.getElementById('userInput').addEventListener('keydown', function(e){
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); }
+});
+</script>
+</body>
+</html>
